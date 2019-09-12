@@ -9,8 +9,7 @@ import android.graphics.Path
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
-import android.view.MotionEvent.ACTION_DOWN
-import android.view.MotionEvent.ACTION_UP
+import android.view.MotionEvent.*
 import android.view.View
 import android.view.animation.*
 import android.widget.FrameLayout
@@ -26,7 +25,6 @@ class CustomDragView : FrameLayout {
 
     init {
         minimumHeight = 300
-
     }
 
 
@@ -37,7 +35,7 @@ class CustomDragView : FrameLayout {
 
     private val fadeOut = AlphaAnimation(1f, 0f).apply {
         interpolator = AccelerateInterpolator() //and this
-        startOffset = 500
+        startOffset = 100
         duration = 500
     }
 
@@ -125,8 +123,6 @@ class CustomDragView : FrameLayout {
 
                     highLightBar.barLength = finalLeft
                     highLightBar.invalidate()
-
-
                 }
                 return finalLeft
             }
@@ -134,11 +130,16 @@ class CustomDragView : FrameLayout {
             override fun clampViewPositionVertical(child: View, top: Int, dy: Int): Int {
                 return 0
             }
-
         })
     }
 
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        parent.requestDisallowInterceptTouchEvent(true)
+        return super.dispatchTouchEvent(ev)
+    }
+
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+        //InterceptTouchEvent is necessary if parent layout is scrollable
         return viewDragHelper.shouldInterceptTouchEvent(ev!!)
     }
 
@@ -147,15 +148,21 @@ class CustomDragView : FrameLayout {
 
         val animation = AnimationSet(false)
 
-        if (event?.action == ACTION_UP) {
-            animation.addAnimation(fadeOut)
-            toastView.animation = animation
-            toastView.startAnimation(animation)
-            toastView.visibility = View.INVISIBLE
-        } else if (event?.action == ACTION_DOWN) {
-            animation.addAnimation(fadeIn)
-            toastView.animation = animation
-            toastView.startAnimation(animation)
+        when {
+            event?.action == ACTION_UP -> {
+                parent.requestDisallowInterceptTouchEvent(false)
+                animation.addAnimation(fadeOut)
+
+
+                toastView.animation = animation
+                toastView.startAnimation(animation)
+                toastView.visibility = View.INVISIBLE
+            }
+            event?.action == ACTION_DOWN -> {
+                animation.addAnimation(fadeIn)
+                toastView.animation = animation
+                toastView.startAnimation(animation)
+            }
         }
 
         viewDragHelper.processTouchEvent(event!!)
@@ -250,7 +257,7 @@ class CustomDragView : FrameLayout {
 
         private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             strokeWidth = 3F
-            color = Color.parseColor("#B42419")
+            color = Color.parseColor("#6290C3")
             style = Paint.Style.FILL
             strokeCap = Paint.Cap.ROUND
         }
@@ -317,7 +324,6 @@ class CustomDragView : FrameLayout {
         override fun onDraw(canvas: Canvas?) {
             super.onDraw(canvas)
             canvas?.drawLine(0f + 100f, height / 2f, barLength + 100f, height / 2f, paint)
-
         }
 
         override fun isFocused(): Boolean = false
