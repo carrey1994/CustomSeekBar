@@ -2,10 +2,7 @@ package com.example.viewdragplay
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Path
+import android.graphics.*
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -26,6 +23,8 @@ class CustomDragView : FrameLayout {
     init {
         minimumHeight = 300
     }
+
+    private var isDotDraw = false
 
 
     private val fadeIn = AlphaAnimation(0f, 1f).apply {
@@ -181,14 +180,14 @@ class CustomDragView : FrameLayout {
 
         private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             strokeWidth = 10f
-            color = Color.parseColor("#D3D0CB")
+            color = Color.parseColor("#1B3242")
             style = Paint.Style.STROKE
             strokeCap = Paint.Cap.ROUND
         }
 
         private val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             strokeWidth = 20f
-            color = Color.parseColor("#D3D0CB")
+            color = Color.parseColor("#1B3242")
             style = Paint.Style.STROKE
             strokeCap = Paint.Cap.ROUND
         }
@@ -200,9 +199,10 @@ class CustomDragView : FrameLayout {
             canvas?.drawLine(0f + 100f, height / 2f, width - 100f, height / 2f, paint)
 
             val part = (width - 200) / 10
-            for (i in 1..10) {
-                canvas?.drawPoint((100 + i * part).toFloat(), height / 2f, dotPaint)
-            }
+            if (isDotDraw)
+                for (i in 1..10) {
+                    canvas?.drawPoint((100 + i * part).toFloat(), height / 2f, dotPaint)
+                }
 
         }
 
@@ -224,7 +224,7 @@ class CustomDragView : FrameLayout {
 
         private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             strokeWidth = 66F
-            color = Color.parseColor("#111D4A")
+            color = Color.parseColor("#F78E1E")
             style = Paint.Style.STROKE
             strokeCap = Paint.Cap.ROUND
         }
@@ -257,7 +257,7 @@ class CustomDragView : FrameLayout {
 
         private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             strokeWidth = 3F
-            color = Color.parseColor("#6290C3")
+            color = Color.parseColor("#f63b34")
             style = Paint.Style.FILL
             strokeCap = Paint.Cap.ROUND
         }
@@ -268,6 +268,7 @@ class CustomDragView : FrameLayout {
             strokeCap = Paint.Cap.ROUND
             textSize = 50f
             textAlign = Paint.Align.CENTER
+            typeface = Typeface.defaultFromStyle(Typeface.BOLD)
         }
 
         @SuppressLint("DrawAllocation")
@@ -279,20 +280,20 @@ class CustomDragView : FrameLayout {
 
             path.moveTo(100f, height / 2f - 220f)
             path.cubicTo(
-                100f - 2 * x,
+                100f - 2f * x,
                 height / 2f - 220f,
-                100 - 2 * x,
-                height / 2f - 120f,
+                100 - 2.2f * x,
+                height / 2f - 90f,
                 100f,
                 height / 2f - 35f
             )
 
             path.moveTo(100f, height / 2f - 220f)
             path.cubicTo(
-                100f + 2 * x,
+                100f + 2f * x,
                 height / 2f - 220f,
-                100f + 2 * x,
-                height / 2f - 120f,
+                100f + 2.2f * x,
+                height / 2f - 90f,
                 100f,
                 height / 2f - 35f
             )
@@ -315,15 +316,29 @@ class CustomDragView : FrameLayout {
         var barLength = 0
         private val paint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             strokeWidth = 20f
-            color = Color.parseColor("#2E5266")
+            color = Color.parseColor("#FEC240")
             style = Paint.Style.STROKE
             strokeCap = Paint.Cap.ROUND
         }
 
+        private val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            strokeWidth = 30f
+            color = Color.parseColor("#FEC240")
+            style = Paint.Style.STROKE
+            strokeCap = Paint.Cap.ROUND
+        }
 
         override fun onDraw(canvas: Canvas?) {
             super.onDraw(canvas)
             canvas?.drawLine(0f + 100f, height / 2f, barLength + 100f, height / 2f, paint)
+
+            val part = (width - 200) / 10
+            val mPart = (barLength / part)
+            if (isDotDraw)
+                for (i in 1..mPart) {
+                    canvas?.drawPoint((100 + i * part).toFloat(), height / 2f, dotPaint)
+                }
+
         }
 
         override fun isFocused(): Boolean = false
